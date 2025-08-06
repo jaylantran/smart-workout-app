@@ -1,0 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #1a1a1d;
+    color: #c5c6c7;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+#setup-screen {
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+}
+
+#setup-screen h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: #66FCF1;
+}
+
+#setup-screen label {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    text-align: left;
+}
+
+#setup-screen select {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    background-color: #2a2a2d;
+    color: #c5c6c7;
+    border: 2px solid #3a3a3d;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+#setup-screen select:focus {
+    outline: none;
+    border-color: #66FCF1;
+}
+
+#generate-btn {
+    background-color: #66FCF1;
+    color: #1a1a1d;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+#generate-btn:hover {
+    background-color: #4fd8d0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 252, 241, 0.3);
+}
+
+#workout-screen {
+    display: none;
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+}
+
+#current-exercise-name {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: #66FCF1;
+}
+
+#timer-display {
+    font-size: 9rem;
+    font-weight: 700;
+    color: #66FCF1;
+    margin: 2rem 0;
+    text-shadow: 0 0 20px rgba(102, 252, 241, 0.5);
+}
+
+#timer-status {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 2rem;
+    color: #c5c6c7;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.controls button {
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    font-family: 'Montserrat', sans-serif;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#start-btn {
+    background-color: #45a049;
+    color: white;
+}
+
+#start-btn:hover {
+    background-color: #3d8b40;
+    transform: translateY(-1px);
+}
+
+#pause-btn {
+    background-color: #f39c12;
+    color: white;
+}
+
+#pause-btn:hover {
+    background-color: #e67e22;
+    transform: translateY(-1px);
+}
+
+#reset-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+#reset-btn:hover {
+    background-color: #c0392b;
+    transform: translateY(-1px);
+}
+
+#workout-screen h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #66FCF1;
+}
+
+#workout-list {
+    text-align: left;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+#workout-list li {
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-bottom: 0.8rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #3a3a3d;
+}
+
+#workout-list li:last-child {
+    border-bottom: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    #setup-screen h1 {
+        font-size: 2rem;
+    }
+    
+    #timer-display {
+        font-size: 6rem;
+    }
+    
+    .controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .controls button {
+        width: 200px;
+    }
+}

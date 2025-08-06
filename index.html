@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart HIIT Workout Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="setup-screen">
+        <h1>Build Your Workout</h1>
+        
+        <label for="muscle-group">Target Muscle Group:</label>
+        <select id="muscle-group">
+            <option value="abdominals">abdominals</option>
+            <option value="biceps">biceps</option>
+            <option value="chest">chest</option>
+            <option value="glutes">glutes</option>
+            <option value="hamstrings">hamstrings</option>
+            <option value="lats">lats</option>
+            <option value="quadriceps">quadriceps</option>
+        </select>
+        
+        <label for="equipment">Available Equipment:</label>
+        <select id="equipment">
+            <option value="none">none</option>
+            <option value="dumbbell">dumbbell</option>
+            <option value="barbell">barbell</option>
+            <option value="kettlebell">kettlebell</option>
+        </select>
+        
+        <button id="generate-btn">Generate Workout</button>
+    </div>
+    
+    <div id="workout-screen">
+        <h2 id="current-exercise-name">Exercise Name</h2>
+        
+        <div id="timer-display">00:30</div>
+        
+        <h3 id="timer-status">WORK</h3>
+        
+        <div class="controls">
+            <button id="start-btn">Start</button>
+            <button id="pause-btn">Pause</button>
+            <button id="reset-btn">Change Workout</button>
+        </div>
+        
+        <h4>Full Workout:</h4>
+        <ol id="workout-list">
+            <!-- Generated exercises will be displayed here -->
+        </ol>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
