@@ -11,29 +11,45 @@
         <h1>Build Your Workout</h1>
         
         <label for="muscle-group">Target Muscle Group:</label>
-        <select id="muscle-group">
+        <select id="muscle-group" multiple size="4">
             <option value="abdominals">abdominals</option>
             <option value="biceps">biceps</option>
             <option value="chest">chest</option>
             <option value="glutes">glutes</option>
             <option value="hamstrings">hamstrings</option>
             <option value="lats">lats</option>
+            <option value="middle_back">middle back</option>
             <option value="quadriceps">quadriceps</option>
+            <option value="shoulders">shoulders</option>
+            <option value="triceps">triceps</option>
         </select>
         
         <label for="equipment">Available Equipment:</label>
-        <select id="equipment">
+        <select id="equipment" multiple size="4">
             <option value="none">none</option>
             <option value="dumbbell">dumbbell</option>
             <option value="barbell">barbell</option>
             <option value="kettlebell">kettlebell</option>
         </select>
         
+        <div class="timer-settings-container">
+            <div class="timer-setting">
+                <label for="work-time">Work Time (seconds):</label>
+                <input type="number" id="work-time" value="30">
+            </div>
+            <div class="timer-setting">
+                <label for="rest-time">Rest Time (seconds):</label>
+                <input type="number" id="rest-time" value="10">
+            </div>
+        </div>
+        
         <button id="generate-btn">Generate Workout</button>
     </div>
     
     <div id="workout-screen">
         <h2 id="current-exercise-name">Exercise Name</h2>
+        
+        <div id="video-container"></div>
         
         <div id="timer-display">00:30</div>
         
