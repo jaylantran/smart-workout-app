@@ -41,6 +41,10 @@
                 <label for="rest-time">Rest Time (seconds):</label>
                 <input type="number" id="rest-time" value="10">
             </div>
+            <div class="timer-setting">
+                <label for="num-exercises">Total Exercises:</label>
+                <input type="number" id="num-exercises" value="5" min="1" max="6">
+            </div>
         </div>
         
         <button id="generate-btn">Generate Workout</button>
@@ -48,8 +52,6 @@
     
     <div id="workout-screen">
         <h2 id="current-exercise-name">Exercise Name</h2>
-        
-        <div id="video-container"></div>
         
         <div id="timer-display">00:30</div>
         

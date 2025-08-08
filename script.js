@@ -24,7 +24,6 @@ const resetBtn = document.getElementById('reset-btn');
 const timerDisplay = document.getElementById('timer-display');
 const timerStatus = document.getElementById('timer-status');
 const currentExerciseName = document.getElementById('current-exercise-name');
-const videoContainer = document.getElementById('video-container');
 
 // Helper function to get all selected options from a multi-select box
 function getSelectedOptions(selectElement) {
@@ -47,6 +46,7 @@ generateBtn.addEventListener('click', async function() {
         // Get selected values from multi-select dropdowns
         const selectedMuscles = getSelectedOptions(muscleGroupSelect);
         const selectedEquipment = getSelectedOptions(equipmentSelect);
+        const numExercises = parseInt(document.getElementById('num-exercises').value);
         
         // Check if user selected at least one muscle group
         if (selectedMuscles.length === 0) {
@@ -54,11 +54,12 @@ generateBtn.addEventListener('click', async function() {
             return;
         }
         
-        // Fetch exercises for each muscle with fallback logic
+        // Step 1: Get all inputs (already done above)
+        
+        // Step 2: Fetch a large pool of exercises from all selected muscle groups
         let allExercises = [];
         
         for (let muscle of selectedMuscles) {
-            // Initial API call for the muscle
             const response = await fetch(`https://api.api-ninjas.com/v1/exercises?muscle=${muscle}`, {
                 headers: {
                     'X-Api-Key': apiKey
@@ -71,27 +72,36 @@ generateBtn.addEventListener('click', async function() {
             
             const exercises = await response.json();
             
-            // Filter exercises based on equipment selection
-            let filteredExercisesForMuscle = [];
+            // Add muscle group information to each exercise
+            const exercisesWithMuscle = exercises.map(exercise => ({
+                ...exercise,
+                muscleGroup: muscle
+            }));
             
-            if (selectedEquipment.length === 0) {
-                // If no equipment selected, include all exercises
-                filteredExercisesForMuscle = exercises;
-            } else if (selectedEquipment.includes('none')) {
-                // If 'none' is selected, filter for 'body_only' exercises
-                filteredExercisesForMuscle = exercises.filter(exercise => exercise.equipment === 'body_only');
-            } else {
-                // Filter for exercises that match any of the selected equipment types
-                filteredExercisesForMuscle = exercises.filter(exercise => 
-                    selectedEquipment.includes(exercise.equipment)
-                );
-            }
+            allExercises = allExercises.concat(exercisesWithMuscle);
+        }
+        
+        // Step 3: Filter the pool based on equipment selection
+        let validExercises = [];
+        
+        if (selectedEquipment.length === 0) {
+            // If no equipment selected, include all exercises
+            validExercises = allExercises;
+        } else if (selectedEquipment.includes('none')) {
+            // If 'none' is selected, filter for 'body_only' exercises
+            validExercises = allExercises.filter(exercise => exercise.equipment === 'body_only');
+        } else {
+            // Filter for exercises that match any of the selected equipment types
+            validExercises = allExercises.filter(exercise => 
+                selectedEquipment.includes(exercise.equipment)
+            );
+        }
+        
+        // Implement fallback: if no exercises found, get body_only exercises
+        if (validExercises.length === 0) {
+            console.log('No exercises found with selected equipment. Falling back to body_only exercises.');
             
-            // Check if the filtered list is empty - if so, perform fallback search
-            if (filteredExercisesForMuscle.length === 0) {
-                console.log(`No exercises found for ${muscle} with selected equipment. Falling back to body_only exercises.`);
-                
-                // Fallback: search for body_only exercises for this muscle
+            for (let muscle of selectedMuscles) {
                 const fallbackResponse = await fetch(`https://api.api-ninjas.com/v1/exercises?muscle=${muscle}`, {
                     headers: {
                         'X-Api-Key': apiKey
@@ -100,27 +110,71 @@ generateBtn.addEventListener('click', async function() {
                 
                 if (fallbackResponse.ok) {
                     const fallbackExercises = await fallbackResponse.json();
-                    // Filter for body_only exercises as fallback
-                    filteredExercisesForMuscle = fallbackExercises.filter(exercise => exercise.equipment === 'body_only');
+                    const bodyOnlyExercises = fallbackExercises
+                        .filter(exercise => exercise.equipment === 'body_only')
+                        .map(exercise => ({ ...exercise, muscleGroup: muscle }));
+                    validExercises = validExercises.concat(bodyOnlyExercises);
                 }
             }
-            
-            // Add the exercises for this muscle to our combined list
-            allExercises = allExercises.concat(filteredExercisesForMuscle);
         }
         
-        // Use the combined and filtered exercises
-        let filteredExercises = allExercises;
+        // Step 4: Intelligent Selection
+        let finalWorkoutPlan = [];
         
-        // Shuffle and select first 5 exercises
-        const shuffledExercises = shuffleArray(filteredExercises);
-        const selectedExercises = shuffledExercises.slice(0, 5);
+        // Step 4a: Create empty finalWorkoutPlan array (already done)
         
-        // Store the selected exercises in global workoutPlan
-        workoutPlan = selectedExercises;
+        // Step 4b: Group validExercises by muscle group
+        const exercisesByMuscle = {};
+        validExercises.forEach(exercise => {
+            if (!exercisesByMuscle[exercise.muscleGroup]) {
+                exercisesByMuscle[exercise.muscleGroup] = [];
+            }
+            exercisesByMuscle[exercise.muscleGroup].push(exercise);
+        });
+        
+        // Step 4c: Guaranteed Representation Loop
+        const muscleGroups = Object.keys(exercisesByMuscle);
+        for (let muscleGroup of muscleGroups) {
+            if (finalWorkoutPlan.length >= numExercises) break;
+            
+            const exercisesForMuscle = exercisesByMuscle[muscleGroup];
+            if (exercisesForMuscle.length > 0) {
+                // Pick one random exercise from this muscle group
+                const randomIndex = Math.floor(Math.random() * exercisesForMuscle.length);
+                const selectedExercise = exercisesForMuscle[randomIndex];
+                finalWorkoutPlan.push(selectedExercise);
+                
+                // Remove this exercise from the validExercises pool
+                const exerciseIndex = validExercises.findIndex(ex => ex.name === selectedExercise.name);
+                if (exerciseIndex > -1) {
+                    validExercises.splice(exerciseIndex, 1);
+                }
+            }
+        }
+        
+        // Step 4d: Filler Loop
+        while (finalWorkoutPlan.length < numExercises && validExercises.length > 0) {
+            const randomIndex = Math.floor(Math.random() * validExercises.length);
+            const selectedExercise = validExercises[randomIndex];
+            finalWorkoutPlan.push(selectedExercise);
+            
+            // Remove this exercise from the pool
+            validExercises.splice(randomIndex, 1);
+        }
+        
+        // Step 5: Finalize
+        const shuffledFinalWorkoutPlan = shuffleArray(finalWorkoutPlan);
+        
+        // Check if we couldn't meet the user's request
+        if (shuffledFinalWorkoutPlan.length < numExercises) {
+            alert(`Could only find ${shuffledFinalWorkoutPlan.length} unique exercises. Your workout will be shorter than requested.`);
+        }
+        
+        // Store the final workout plan in global workoutPlan
+        workoutPlan = shuffledFinalWorkoutPlan;
         
         // Display the workout
-        displayWorkout(selectedExercises);
+        displayWorkout(shuffledFinalWorkoutPlan);
         
         // Setup the workout UI
         setupWorkoutUI();
@@ -167,9 +221,6 @@ function setupWorkoutUI() {
     // Set the first exercise name
     currentExerciseName.textContent = workoutPlan[0].name;
     
-    // Display video for the first exercise
-    displayExerciseVideo(workoutPlan[0].name);
-    
     // Reset timer display
     timerDisplay.textContent = formatTime(timeLeft);
     
@@ -213,9 +264,6 @@ function updateTimer() {
             timeLeft = workDuration;
             timerStatus.textContent = 'WORK';
             currentExerciseName.textContent = workoutPlan[currentExerciseIndex].name;
-            
-            // Display video for the new exercise
-            displayExerciseVideo(workoutPlan[currentExerciseIndex].name);
         }
     }
 }
@@ -245,30 +293,5 @@ resetBtn.addEventListener('click', function() {
     setupScreen.style.display = 'block';
 });
 
-// Function to display YouTube video for the current exercise
-function displayExerciseVideo(exerciseName) {
-    // Clear the video container's current content
-    videoContainer.innerHTML = '';
-    
-    // Simplify the exercise name for better YouTube search results
-    let simpleName = exerciseName.toLowerCase();
-    // Remove common equipment words
-    simpleName = simpleName.replace(/\b(dumbbell|barbell|kettlebell|bodyweight)\b/g, '');
-    // Clean up extra spaces
-    simpleName = simpleName.replace(/\s+/g, ' ').trim();
-    
-    // Create YouTube embed URL with the simplified name
-    const encodedExerciseName = encodeURIComponent(simpleName);
-    const youtubeUrl = `https://www.youtube.com/embed?listType=search&list=${encodedExerciseName}`;
-    
-    // Create iframe element
-    const iframe = document.createElement('iframe');
-    iframe.src = youtubeUrl;
-    iframe.width = '100%';
-    iframe.height = '100%';
-    iframe.allowFullscreen = true;
-    iframe.title = `${exerciseName} demonstration`;
-    
-    // Append the iframe to the video container
-    videoContainer.appendChild(iframe);
-}
+
+
